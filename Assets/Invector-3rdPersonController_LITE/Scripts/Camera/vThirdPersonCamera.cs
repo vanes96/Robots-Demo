@@ -89,6 +89,7 @@ public class vThirdPersonCamera : MonoBehaviour
         if (target == null || targetLookAt == null) return;
 
         CameraMovement();
+        _camera.transform.LookAt(currentTarget);
     }
 
     /// <summary>
