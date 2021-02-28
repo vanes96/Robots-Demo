@@ -43,7 +43,7 @@ namespace Invector.vCharacterController
             if (lockRotation) return;
 
             bool validInput = input != Vector3.zero || (isStrafing ? strafeSpeed.rotateWithCamera : freeSpeed.rotateWithCamera);
-
+            validInput = false;
             if (validInput)
             {
                 // calculate input smooth
@@ -52,6 +52,28 @@ namespace Invector.vCharacterController
                 Vector3 dir = (isStrafing && (!isSprinting || sprintOnlyFree == false) || (freeSpeed.rotateWithCamera && input == Vector3.zero)) && rotateTarget ? rotateTarget.forward : moveDirection;
                 RotateToDirection(dir);
             }
+            else
+            {
+                Camera camera = Camera.main;
+                Plane plane = new Plane(transform.up, -transform.position.y);
+                Vector3 mousePosition = Input.mousePosition;
+                Vector3 mouseWorldPosition = Vector3.zero;
+
+                float distance;
+                Ray ray = camera.ScreenPointToRay(mousePosition);
+                if (plane.Raycast(ray, out distance))
+                {
+                    mouseWorldPosition = ray.GetPoint(distance);
+                }
+
+                //Debug.Log($"diff = {mouseWorldPosition}");
+                
+                var direction = mouseWorldPosition - transform.position;
+                direction.Normalize();
+                float rotationY = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
+                transform.localRotation = Quaternion.Euler(0, 90 - rotationY, 0);                
+            }
+
         }
 
         public virtual void UpdateMoveDirection(Transform referenceTransform = null)
