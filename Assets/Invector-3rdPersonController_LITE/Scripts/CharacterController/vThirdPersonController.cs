@@ -4,6 +4,8 @@ namespace Invector.vCharacterController
 {
     public class vThirdPersonController : vThirdPersonAnimator
     {
+        private float lastShotTime = 0;
+        
         public virtual void ControlAnimatorRootMotion()
         {
             if (!this.enabled) return;
@@ -36,6 +38,20 @@ namespace Invector.vCharacterController
 
             if (!useRootMotion)
                 MoveCharacter(moveDirection);
+
+            
+
+            if (Input.GetKey(KeyCode.Mouse0) && lastShotTime > ShotDuration)
+            {         
+                lastShotTime = 0;
+                var bullet = Instantiate(BulletPrefab);
+                bullet.transform.SetPositionAndRotation(LeftBulletPlace.position, Quaternion.Euler(0,0,90));
+                bullet.GetComponent<Rigidbody>().AddForce(LeftBulletPlace.forward * ShotForce);
+            }
+            else
+            {
+                lastShotTime += Time.deltaTime;
+            }
         }
 
         public virtual void ControlRotationType()

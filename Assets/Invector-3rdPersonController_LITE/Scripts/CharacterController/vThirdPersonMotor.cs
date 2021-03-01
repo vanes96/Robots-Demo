@@ -6,6 +6,14 @@ namespace Invector.vCharacterController
     {
         #region Inspector Variables
 
+        public GameObject BulletPrefab;
+        public Transform LeftBulletPlace;
+        public Transform RightBulletPlace;
+        [Range(0,2000)]
+        public float ShotForce;
+        [Range(0, 1)]
+        public float ShotDuration;
+
         [Header("- Movement")]
 
         [Tooltip("Turn off if you have 'in place' animations and use this values above to move the character, or use with root motion as extra speed")]
