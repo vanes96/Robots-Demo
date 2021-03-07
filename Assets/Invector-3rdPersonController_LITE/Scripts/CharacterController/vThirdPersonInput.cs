@@ -31,6 +31,7 @@ namespace Invector.vCharacterController
 
         protected virtual void FixedUpdate()
         {
+            Time.timeScale = 1f;
             cc.UpdateMotor();               // updates the ThirdPersonMotor methods
             cc.ControlLocomotionType();     // handle the controller locomotion type and movespeed
             cc.ControlRotationType();       // handle the controller rotation type
@@ -77,7 +78,7 @@ namespace Invector.vCharacterController
             MoveInput();
             CameraInput();
             SprintInput();
-            StrafeInput();
+            //StrafeInput();
             JumpInput();
         }
 
@@ -111,12 +112,6 @@ namespace Invector.vCharacterController
             var X = Input.GetAxis(rotateCameraXInput);
 
             tpCamera.RotateCamera(X, Y);
-        }
-
-        protected virtual void StrafeInput()
-        {
-            if (Input.GetKeyDown(strafeInput))
-                cc.Strafe();
         }
 
         protected virtual void SprintInput()

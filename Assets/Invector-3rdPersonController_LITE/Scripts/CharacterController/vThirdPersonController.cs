@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Invector.vCharacterController
 {
     public class vThirdPersonController : vThirdPersonAnimator
     {
         private float lastShotTime = 0;
+        private bool lastShotWasLeft = false;       
         
         public virtual void ControlAnimatorRootMotion()
         {
@@ -24,29 +26,33 @@ namespace Invector.vCharacterController
         {
             if (lockMovement) return;
 
-            if (locomotionType.Equals(LocomotionType.FreeWithStrafe) && !isStrafing || locomotionType.Equals(LocomotionType.OnlyFree))
+            if (true)
             {
                 SetControllerMoveSpeed(freeSpeed);
                 SetAnimatorMoveSpeed(freeSpeed);
             }
-            else if (locomotionType.Equals(LocomotionType.OnlyStrafe) || locomotionType.Equals(LocomotionType.FreeWithStrafe) && isStrafing)
-            {
-                isStrafing = true;
-                SetControllerMoveSpeed(strafeSpeed);
-                SetAnimatorMoveSpeed(strafeSpeed);
-            }
 
             if (!useRootMotion)
+            {
                 MoveCharacter(moveDirection);
-
+            }
             
 
             if (Input.GetKey(KeyCode.Mouse0) && lastShotTime > ShotDuration)
             {         
                 lastShotTime = 0;
                 var bullet = Instantiate(BulletPrefab);
-                bullet.transform.SetPositionAndRotation(LeftBulletPlace.position, Quaternion.Euler(0,0,90));
-                bullet.GetComponent<Rigidbody>().AddForce(LeftBulletPlace.forward * ShotForce);
+                var bulletStartPlace = LeftBulletStartPlace;
+
+                if (lastShotWasLeft)
+                {
+                    bulletStartPlace = RightBulletStartPlace;
+                }
+
+                bullet.transform.SetPositionAndRotation(bulletStartPlace.position, bulletStartPlace.rotation);
+                bullet.GetComponent<Rigidbody>().AddForce(bulletStartPlace.up * ShotForce);
+                lastShotWasLeft = !lastShotWasLeft;
+
             }
             else
             {
@@ -58,54 +64,52 @@ namespace Invector.vCharacterController
         {
             if (lockRotation) return;
 
-            bool validInput = input != Vector3.zero || (isStrafing ? strafeSpeed.rotateWithCamera : freeSpeed.rotateWithCamera);
-            validInput = false;
-            if (validInput)
+            //bool validInput = input != Vector3.zero || (isStrafing ? strafeSpeed.rotateWithCamera : freeSpeed.rotateWithCamera);
+            //validInput = false;
+            //if (validInput)
+            //{
+            //    // calculate input smooth
+            //    inputSmooth = Vector3.Lerp(inputSmooth, input, (isStrafing ? strafeSpeed.movementSmooth : freeSpeed.movementSmooth) * Time.deltaTime);
+
+            //    Vector3 dir = freeSpeed.rotateWithCamera && input == Vector3.zero && rotateTarget ? rotateTarget.forward : moveDirection;
+            //    RotateToDirection(dir);
+            //}
+            //else
+            //{
+
+            Camera camera = Camera.main;
+            Plane plane = new Plane(transform.up, -transform.position.y);
+            Vector3 mousePosition = Input.mousePosition;
+            Vector3 mouseWorldPosition = Vector3.zero;
+
+            float distance;
+            Ray ray = camera.ScreenPointToRay(mousePosition);
+            if (plane.Raycast(ray, out distance))
             {
-                // calculate input smooth
-                inputSmooth = Vector3.Lerp(inputSmooth, input, (isStrafing ? strafeSpeed.movementSmooth : freeSpeed.movementSmooth) * Time.deltaTime);
-
-                Vector3 dir = (isStrafing && (!isSprinting || sprintOnlyFree == false) || (freeSpeed.rotateWithCamera && input == Vector3.zero)) && rotateTarget ? rotateTarget.forward : moveDirection;
-                RotateToDirection(dir);
-            }
-            else
-            {
-                Camera camera = Camera.main;
-                Plane plane = new Plane(transform.up, -transform.position.y);
-                Vector3 mousePosition = Input.mousePosition;
-                Vector3 mouseWorldPosition = Vector3.zero;
-
-                float distance;
-                Ray ray = camera.ScreenPointToRay(mousePosition);
-                if (plane.Raycast(ray, out distance))
-                {
-                    mouseWorldPosition = ray.GetPoint(distance);
-                }
-
-                //Debug.Log($"diff = {mouseWorldPosition}");
-                
-                var direction = mouseWorldPosition - transform.position;
-                direction.Normalize();
-                float rotationY = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
-                transform.localRotation = Quaternion.Euler(0, 90 - rotationY, 0);                
+                mouseWorldPosition = ray.GetPoint(distance);
             }
 
+            var direction = mouseWorldPosition - transform.position;
+            direction.Normalize();
+            float rotationY = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
+            transform.localRotation = Quaternion.Euler(0, 90 - rotationY, 0);    
+            
+            //}
         }
 
         public virtual void UpdateMoveDirection(Transform referenceTransform = null)
         {
             if (input.magnitude <= 0.01)
             {
-                moveDirection = Vector3.Lerp(moveDirection, Vector3.zero, (isStrafing ? strafeSpeed.movementSmooth : freeSpeed.movementSmooth) * Time.deltaTime);
+                moveDirection = Vector3.Lerp(moveDirection, Vector3.zero, freeSpeed.movementSmooth * Time.deltaTime);
                 return;
             }
 
             if (referenceTransform && !rotateByWorld)
             {
-                //get the right-facing direction of the referenceTransform
                 var right = referenceTransform.right;
                 right.y = 0;
-                //get the forward direction relative to referenceTransform Right
+
                 var forward = Quaternion.AngleAxis(-90, Vector3.up) * right;
                 // determine the direction the player will face based on input and the referenceTransform's right and forward directions
                 moveDirection = (inputSmooth.x * right) + (inputSmooth.z * forward);
@@ -118,8 +122,7 @@ namespace Invector.vCharacterController
 
         public virtual void Sprint(bool value)
         {
-            var sprintConditions = (input.sqrMagnitude > 0.1f && isGrounded &&
-                !(isStrafing && !strafeSpeed.walkByDefault && (horizontalSpeed >= 0.5 || horizontalSpeed <= -0.5 || verticalSpeed <= 0.1f)));
+            var sprintConditions = (input.sqrMagnitude > 0.1f && isGrounded && !(horizontalSpeed >= 0.5 || horizontalSpeed <= -0.5 || verticalSpeed <= 0.1f));
 
             if (value && sprintConditions)
             {
@@ -143,11 +146,6 @@ namespace Invector.vCharacterController
             {
                 isSprinting = false;
             }
-        }
-
-        public virtual void Strafe()
-        {
-            isStrafing = !isStrafing;
         }
 
         public virtual void Jump()

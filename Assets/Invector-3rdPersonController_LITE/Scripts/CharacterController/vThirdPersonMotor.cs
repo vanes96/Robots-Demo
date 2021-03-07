@@ -7,12 +7,14 @@ namespace Invector.vCharacterController
         #region Inspector Variables
 
         public GameObject BulletPrefab;
-        public Transform LeftBulletPlace;
-        public Transform RightBulletPlace;
+        public Transform LeftBulletStartPlace;
+        public Transform RightBulletStartPlace;
         [Range(0,2000)]
         public float ShotForce;
         [Range(0, 1)]
         public float ShotDuration;
+        //[Range(0, 180)]
+        //public int ShotAngle;
 
         [Header("- Movement")]
 
@@ -26,13 +28,11 @@ namespace Invector.vCharacterController
         public bool sprintOnlyFree = true;
         public enum LocomotionType
         {
-            FreeWithStrafe,
-            OnlyStrafe,
-            OnlyFree,
+            OnlyFree
         }
-        public LocomotionType locomotionType = LocomotionType.FreeWithStrafe;
+        //public LocomotionType locomotionType = LocomotionType.FreeWithStrafe;
 
-        public vMovementSpeed freeSpeed, strafeSpeed;
+        public vMovementSpeed freeSpeed;//, strafeSpeed;
 
         [Header("- Airborne")]
 
@@ -77,17 +77,17 @@ namespace Invector.vCharacterController
 
         // movement bools
         internal bool isJumping;
-        internal bool isStrafing
-        {
-            get
-            {
-                return _isStrafing;
-            }
-            set
-            {
-                _isStrafing = value;
-            }
-        }
+        //internal bool isStrafing
+        //{
+        //    get
+        //    {
+        //        return _isStrafing;
+        //    }
+        //    set
+        //    {
+        //        _isStrafing = value;
+        //    }
+        //}
         internal bool isGrounded { get; set; }
         internal bool isSprinting { get; set; }
         public bool stopMove { get; protected set; }
@@ -174,7 +174,7 @@ namespace Invector.vCharacterController
         public virtual void MoveCharacter(Vector3 _direction)
         {
             // calculate input smooth
-            inputSmooth = Vector3.Lerp(inputSmooth, input, (isStrafing ? strafeSpeed.movementSmooth : freeSpeed.movementSmooth) * Time.deltaTime);
+            inputSmooth = Vector3.Lerp(inputSmooth, input, freeSpeed.movementSmooth * Time.deltaTime);
 
             if (!isGrounded || isJumping) return;
 
@@ -227,7 +227,7 @@ namespace Invector.vCharacterController
 
         public virtual void RotateToDirection(Vector3 direction)
         {
-            RotateToDirection(direction, isStrafing ? strafeSpeed.rotationSpeed : freeSpeed.rotationSpeed);
+            RotateToDirection(direction, freeSpeed.rotationSpeed);
         }
 
         public virtual void RotateToDirection(Vector3 direction, float rotationSpeed)
@@ -379,7 +379,7 @@ namespace Invector.vCharacterController
 
         public virtual float GroundAngleFromDirection()
         {
-            var dir = isStrafing && input.magnitude > 0 ? (transform.right * input.x + transform.forward * input.z).normalized : transform.forward;
+            var dir = transform.forward;
             var movementAngle = Vector3.Angle(dir, groundHit.normal) - 90;
             return movementAngle;
         }
