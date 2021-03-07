@@ -17,9 +17,6 @@ namespace Invector.vCharacterController
                 transform.position = animator.rootPosition;
                 transform.rotation = animator.rootRotation;
             }
-
-            if (useRootMotion)
-                MoveCharacter(moveDirection);
         }
 
         public virtual void ControlLocomotionType()
@@ -32,10 +29,7 @@ namespace Invector.vCharacterController
                 SetAnimatorMoveSpeed(freeSpeed);
             }
 
-            if (!useRootMotion)
-            {
-                MoveCharacter(moveDirection);
-            }
+            MoveCharacter(moveDirection);
             
 
             if (Input.GetKey(KeyCode.Mouse0) && lastShotTime > ShotDuration)
@@ -105,7 +99,7 @@ namespace Invector.vCharacterController
                 return;
             }
 
-            if (referenceTransform && !rotateByWorld)
+            if (referenceTransform)
             {
                 var right = referenceTransform.right;
                 right.y = 0;
@@ -151,7 +145,7 @@ namespace Invector.vCharacterController
         public virtual void Jump()
         {
             // trigger jump behaviour
-            jumpCounter = jumpTimer;
+            jumpCounter = jumpDuration;
             isJumping = true;
 
             // trigger jump animations

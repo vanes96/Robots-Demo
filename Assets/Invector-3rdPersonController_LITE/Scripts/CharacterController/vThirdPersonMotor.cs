@@ -13,41 +13,27 @@ namespace Invector.vCharacterController
         public float ShotForce;
         [Range(0, 1)]
         public float ShotDuration;
-        //[Range(0, 180)]
-        //public int ShotAngle;
 
-        [Header("- Movement")]
+        [Header("Movement")]
 
-        [Tooltip("Turn off if you have 'in place' animations and use this values above to move the character, or use with root motion as extra speed")]
-        public bool useRootMotion = false;
-        [Tooltip("Use this to rotate the character using the World axis, or false to use the camera axis - CHECK for Isometric Camera")]
-        public bool rotateByWorld = false;
         [Tooltip("Check This to use sprint on press button to your Character run until the stamina finish or movement stops\nIf uncheck your Character will sprint as long as the SprintInput is pressed or the stamina finishes")]
         public bool useContinuousSprint = true;
-        [Tooltip("Check this to sprint always in free movement")]
-        public bool sprintOnlyFree = true;
         public enum LocomotionType
         {
             OnlyFree
         }
         //public LocomotionType locomotionType = LocomotionType.FreeWithStrafe;
 
-        public vMovementSpeed freeSpeed;//, strafeSpeed;
+        public vMovementSpeed freeSpeed;
 
-        [Header("- Airborne")]
+        [Header("Airborne")]
 
         [Tooltip("Use the currently Rigidbody Velocity to influence on the Jump Distance")]
         public bool jumpWithRigidbodyForce = false;
-        [Tooltip("Rotate or not while airborne")]
-        public bool jumpAndRotate = true;
-        [Tooltip("How much time the character will be jumping")]
-        public float jumpTimer = 0.3f;
-        [Tooltip("Add Extra jump height, if you want to jump only with Root Motion leave the value with 0.")]
+        public float jumpDuration = 0.3f;
         public float jumpHeight = 4f;
 
-        [Tooltip("Speed that the character will move while airborne")]
         public float airSpeed = 5f;
-        [Tooltip("Smoothness of the direction while airborne")]
         public float airSmooth = 6f;
         [Tooltip("Apply extra gravity when the character is not grounded")]
         public float extraGravity = -10f;
@@ -75,19 +61,7 @@ namespace Invector.vCharacterController
 
         #region Internal Variables
 
-        // movement bools
         internal bool isJumping;
-        //internal bool isStrafing
-        //{
-        //    get
-        //    {
-        //        return _isStrafing;
-        //    }
-        //    set
-        //    {
-        //        _isStrafing = value;
-        //    }
-        //}
         internal bool isGrounded { get; set; }
         internal bool isSprinting { get; set; }
         public bool stopMove { get; protected set; }
@@ -165,10 +139,7 @@ namespace Invector.vCharacterController
 
         public virtual void SetControllerMoveSpeed(vMovementSpeed speed)
         {
-            if (speed.walkByDefault)
-                moveSpeed = Mathf.Lerp(moveSpeed, isSprinting ? speed.runningSpeed : speed.walkSpeed, speed.movementSmooth * Time.deltaTime);
-            else
-                moveSpeed = Mathf.Lerp(moveSpeed, isSprinting ? speed.sprintSpeed : speed.runningSpeed, speed.movementSmooth * Time.deltaTime);
+            moveSpeed = Mathf.Lerp(moveSpeed, isSprinting ? speed.runningSpeed : speed.walkSpeed, speed.movementSmooth * Time.deltaTime);
         }
 
         public virtual void MoveCharacter(Vector3 _direction)
@@ -185,7 +156,7 @@ namespace Invector.vCharacterController
             if (_direction.magnitude > 1f)
                 _direction.Normalize();
 
-            Vector3 targetPosition = (useRootMotion ? animator.rootPosition : _rigidbody.position) + _direction * (stopMove ? 0 : moveSpeed) * Time.deltaTime;
+            Vector3 targetPosition = _rigidbody.position + _direction * (stopMove ? 0 : moveSpeed) * Time.deltaTime;
             Vector3 targetVelocity = (targetPosition - transform.position) / Time.deltaTime;
 
             bool useVerticalVelocity = true;
@@ -222,21 +193,7 @@ namespace Invector.vCharacterController
         public virtual void RotateToPosition(Vector3 position)
         {
             Vector3 desiredDirection = position - transform.position;
-            RotateToDirection(desiredDirection.normalized);
-        }
-
-        public virtual void RotateToDirection(Vector3 direction)
-        {
-            RotateToDirection(direction, freeSpeed.rotationSpeed);
-        }
-
-        public virtual void RotateToDirection(Vector3 direction, float rotationSpeed)
-        {
-            if (!jumpAndRotate && !isGrounded) return;
-            direction.y = 0f;
-            Vector3 desiredForward = Vector3.RotateTowards(transform.forward, direction.normalized, rotationSpeed * Time.deltaTime, .1f);
-            Quaternion _newRotation = Quaternion.LookRotation(desiredForward);
-            transform.rotation = _newRotation;
+            //RotateToDirection(desiredDirection.normalized);
         }
 
         #endregion
@@ -280,16 +237,6 @@ namespace Invector.vCharacterController
 
             targetVelocity.y = _rigidbody.velocity.y;
             _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, airSmooth * Time.deltaTime);
-        }
-
-        protected virtual bool jumpFwdCondition
-        {
-            get
-            {
-                Vector3 p1 = transform.position + _capsuleCollider.center + Vector3.up * -_capsuleCollider.height * 0.5F;
-                Vector3 p2 = p1 + Vector3.up * _capsuleCollider.height;
-                return Physics.CapsuleCastAll(p1, p2, _capsuleCollider.radius * 0.5f, transform.forward, 0.6f, groundLayer).Length == 0;
-            }
         }
 
         #endregion
@@ -377,13 +324,6 @@ namespace Invector.vCharacterController
             return groundAngle;
         }
 
-        public virtual float GroundAngleFromDirection()
-        {
-            var dir = transform.forward;
-            var movementAngle = Vector3.Angle(dir, groundHit.normal) - 90;
-            return movementAngle;
-        }
-
         #endregion
 
         [System.Serializable]
@@ -395,8 +335,6 @@ namespace Invector.vCharacterController
             public float animationSmooth = 0.2f;
             [Tooltip("Rotation speed of the character")]
             public float rotationSpeed = 16f;
-            [Tooltip("Character will limit the movement to walk instead of running")]
-            public bool walkByDefault = false;
             [Tooltip("Rotate with the Camera forward when standing idle")]
             public bool rotateWithCamera = false;
             [Tooltip("Speed to Walk using rigidbody or extra speed if you're using RootMotion")]

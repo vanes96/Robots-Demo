@@ -10,7 +10,6 @@ namespace Invector.vCharacterController
         public string horizontalInput = "Horizontal";
         public string verticallInput = "Vertical";
         public KeyCode jumpInput = KeyCode.Space;
-        public KeyCode strafeInput = KeyCode.Tab;
         public KeyCode sprintInput = KeyCode.LeftShift;
 
         [Header("Camera Input")]
@@ -78,7 +77,6 @@ namespace Invector.vCharacterController
             MoveInput();
             CameraInput();
             SprintInput();
-            //StrafeInput();
             JumpInput();
         }
 
