@@ -29,9 +29,10 @@ namespace Invector.vCharacterController
             //}
             //else
             //{
-                animator.SetFloat(vAnimatorParameters.InputVertical, stopMove ? 0 : verticalSpeed, freeSpeed.animationSmooth, Time.deltaTime);
+
             //}
 
+            //animator.SetFloat(vAnimatorParameters.InputVertical, stopMove ? 0 : verticalSpeed, freeSpeed.animationSmooth, Time.deltaTime);
             animator.SetFloat(vAnimatorParameters.InputMagnitude, stopMove ? 0f : inputMagnitude, freeSpeed.animationSmooth, Time.deltaTime);
         }
 

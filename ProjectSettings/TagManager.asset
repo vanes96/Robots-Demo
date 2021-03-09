@@ -15,10 +15,10 @@ TagManager:
   - 
   - 
   - PostProcessing
-  - 
-  - 
-  - 
-  - 
+  - Floor
+  - Obstacle
+  - Enemy
+  - Player
   - 
   - 
   - 
