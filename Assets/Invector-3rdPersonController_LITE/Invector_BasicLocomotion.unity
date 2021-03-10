@@ -9717,6 +9717,12 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 789325124}
   m_Mesh: {fileID: 4300000, guid: dee2cc7c00fcd6b4f90719f3660798f8, type: 3}
+--- !u!4 &789454056 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5604273440965337110, guid: 26bc672ecdbfde8429ad9df7fef29bce,
+    type: 3}
+  m_PrefabInstance: {fileID: 5604273440412089598}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &798197151
 GameObject:
   m_ObjectHideFlags: 0
@@ -17066,7 +17072,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1488901958
 Transform:
   m_ObjectHideFlags: 0
@@ -22578,6 +22584,12 @@ Transform:
   m_Father: {fileID: 8117752082361850813}
   m_RootOrder: 27
   m_LocalEulerAnglesHint: {x: 0, y: 60.000004, z: 0}
+--- !u!4 &2020718803 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5604273439735710765, guid: 26bc672ecdbfde8429ad9df7fef29bce,
+    type: 3}
+  m_PrefabInstance: {fileID: 5604273440412089598}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2025273308
 GameObject:
   m_ObjectHideFlags: 0
@@ -23508,13 +23520,13 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
+  m_Speed: 3
+  m_Acceleration: 7
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 4
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 2
   m_BaseOffset: 0
@@ -23534,6 +23546,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 2360952414622328278}
   player: {fileID: 64300189}
+  BulletPrefab: {fileID: 4775723623865806971, guid: f88fbc74021a0054d8d2f62cb6303ae4,
+    type: 3}
+  LeftBulletStartPlace: {fileID: 2020718803}
+  RightBulletStartPlace: {fileID: 789454056}
   whatIsGround:
     serializedVersion: 2
     m_Bits: 512
@@ -23548,15 +23564,18 @@ MonoBehaviour:
     walkSpeed: 2
     runningSpeed: 4
     sprintSpeed: 6
+  ShotDuration: 0.565
+  IsMoving: 0
   health: 0
-  ShotForce: 60
+  ShotForce: 600
   walkPoint: {x: 0, y: 0, z: 0}
   walkPointRange: 10
   timeBetweenAttacks: 0.5
   projectile: {fileID: 4775723623865806971, guid: f88fbc74021a0054d8d2f62cb6303ae4,
     type: 3}
-  sightRange: 15
-  attackRange: 10
+  sightRange: 12
+  attackRange: 8
+  MinDistanceToPlayer: 3
   playerInSightRange: 0
   playerInAttackRange: 0
 --- !u!1001 &2700874170707504416
@@ -23681,10 +23700,15 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 4425428723088313499, guid: fc9b148a2950aaf4cba8422632222c5d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4425428723088313501, guid: fc9b148a2950aaf4cba8422632222c5d,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9.78
+      value: 20.19
       objectReference: {fileID: 0}
     - target: {fileID: 4425428723088313501, guid: fc9b148a2950aaf4cba8422632222c5d,
         type: 3}
@@ -23821,6 +23845,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7855870624701421868, guid: 26bc672ecdbfde8429ad9df7fef29bce,
+        type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7855870624701421869, guid: 26bc672ecdbfde8429ad9df7fef29bce,
         type: 3}

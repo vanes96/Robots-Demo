@@ -8,9 +8,15 @@ public class EnemyAiTutorial : MonoBehaviour
 
     public Transform player;
 
+    public GameObject BulletPrefab;
+    public Transform LeftBulletStartPlace;
+    public Transform RightBulletStartPlace;
+
     public LayerMask whatIsGround, whatIsPlayer;
     public vMovementSpeed freeSpeed;
     public const float walkSpeed = 0.5f;
+    [Range(0, 1)]
+    public float ShotDuration;
 
     internal float moveSpeed;                           // set the current moveSpeed for the MoveCharacter method
 
@@ -23,7 +29,8 @@ public class EnemyAiTutorial : MonoBehaviour
     internal float inputMagnitude;                      // sets the inputMagnitude to update the animations in the animator controller
     internal float verticalSpeed;                       // set the verticalSpeed based on the verticalInput
     internal float horizontalSpeed;                     // set the horizontalSpeed based on the horizontalInput  
-    bool stopMove = true;
+    public bool IsMoving = false;
+    private float _currentDistanceToPlayer;
 
     public float health;
     [Range(0, 2000)]
@@ -40,8 +47,11 @@ public class EnemyAiTutorial : MonoBehaviour
     public GameObject projectile;
 
     //States
-    public float sightRange, attackRange;
+    public float sightRange, attackRange, MinDistanceToPlayer;
     public bool playerInSightRange, playerInAttackRange;
+
+    private float lastShotTime = 0;
+    private bool lastShotWasLeft = false;
 
     private void Awake()
     {
@@ -56,16 +66,28 @@ public class EnemyAiTutorial : MonoBehaviour
     {
         //Check for sight and attack range
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
+        //_currentDistanceToPlayer = Vector3.Distance(player.position, transform.position);
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
-        stopMove = false;
-        if (!playerInSightRange && !playerInAttackRange)
+        IsMoving = false;
+        if (playerInSightRange)
         {
-            Patroling();
+            transform.LookAt(player);
         }
-        if (playerInSightRange && !playerInAttackRange)
-        { 
+
+        //if (!playerInSightRange && !playerInAttackRange)
+        //{
+        //    Patroling();
+        //}
+        //Debug.Log(agent.remainingDistance);
+        agent.SetDestination(player.position);
+        if (playerInSightRange && agent.remainingDistance > agent.stoppingDistance)
+        {
             ChasePlayer(); 
+        }
+        else
+        {
+            agent.isStopped = true;
         }
         if (playerInAttackRange && playerInSightRange)
         {
@@ -77,6 +99,8 @@ public class EnemyAiTutorial : MonoBehaviour
 
     private void Patroling()
     {
+        Debug.Log("Patroling");
+
         if (!walkPointSet) SearchWalkPoint();
 
         if (walkPointSet)
@@ -88,6 +112,7 @@ public class EnemyAiTutorial : MonoBehaviour
         if (distanceToWalkPoint.magnitude < 1f)
             walkPointSet = false;
 
+        IsMoving = true;
     }
     private void SearchWalkPoint()
     {
@@ -103,27 +128,49 @@ public class EnemyAiTutorial : MonoBehaviour
 
     private void ChasePlayer()
     {
-        agent.SetDestination(player.position);
+        Debug.Log("ChasePlayer");       
+        transform.LookAt(player);
+        agent.isStopped = false;
+        IsMoving = true;
     }
 
     private void AttackPlayer()
     {
+        Debug.Log("AttackPlayer");
         //Make sure enemy doesn't move
-        agent.SetDestination(transform.position);
+        //agent.SetDestination(transform.position);
 
         transform.LookAt(player);
 
-        if (!alreadyAttacked)
+        //if (!alreadyAttacked) 
+            if (lastShotTime > ShotDuration)
         {
             ///Attack code here
-            Rigidbody rb = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
-            rb.AddForce(transform.forward * ShotForce, ForceMode.Impulse);
-            rb.AddForce(transform.up * ShotForce / 4f, ForceMode.Impulse);
+            var bullet = Instantiate(BulletPrefab);
+            var bulletStartPlace = LeftBulletStartPlace;
+            lastShotTime = 0;
+            if (lastShotWasLeft)
+            {
+                bulletStartPlace = RightBulletStartPlace;
+            }
+
+            bullet.transform.SetPositionAndRotation(bulletStartPlace.position, bulletStartPlace.rotation);
+            bullet.GetComponent<Rigidbody>().AddForce(bulletStartPlace.up * ShotForce);
+            lastShotWasLeft = !lastShotWasLeft;
+
+            //Rigidbody bullet = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
+            //bullet.AddForce(transform.forward * ShotForce, ForceMode.Impulse);
+            //bullet.AddForce(transform.up * ShotForce / 4f, ForceMode.Impulse);
             ///End of attack code
 
-            alreadyAttacked = true;
-            Invoke(nameof(ResetAttack), timeBetweenAttacks);
+            //alreadyAttacked = true;
+            //Invoke(nameof(ResetAttack), timeBetweenAttacks);
         }
+        else
+        {
+            lastShotTime += Time.deltaTime;
+        }
+        //isMoving = true;
     }
     private void ResetAttack()
     {
@@ -150,7 +197,7 @@ public class EnemyAiTutorial : MonoBehaviour
         //    inputMagnitude = Mathf.Clamp(isSprinting ? newInput.magnitude + 0.5f : newInput.magnitude, 0, isSprinting ? sprintSpeed : runningSpeed);
     }
 
-    public void UpdateAnimator(bool stop = false)
+    public void UpdateAnimator()
     {
         if (animator == null || !animator.enabled) return;
 
@@ -162,7 +209,7 @@ public class EnemyAiTutorial : MonoBehaviour
         inputMagnitude = 0.5f;
 
         //animator.SetFloat(vAnimatorParameters.InputVertical, verticalSpeed, freeSpeed.animationSmooth, Time.deltaTime);
-        animator.SetFloat(vAnimatorParameters.InputMagnitude, stop ? 0f : inputMagnitude, freeSpeed.animationSmooth, Time.deltaTime);
+        animator.SetFloat(vAnimatorParameters.InputMagnitude, IsMoving ? inputMagnitude : 0, freeSpeed.animationSmooth, Time.deltaTime);
     }
 
     public void SetControllerMoveSpeed(vMovementSpeed speed)
