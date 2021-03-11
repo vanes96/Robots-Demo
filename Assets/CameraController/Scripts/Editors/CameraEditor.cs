@@ -192,13 +192,13 @@ namespace ССP.Editors
                         }
                     }
 
-                    bool isRotationEnabled = IsPropertyValuePositive(PropertiesDictionary[Rotating + Speed].Item1),
-                         isLiftingEnabled = IsPropertyValuePositive(PropertiesDictionary[Lifting + Speed].Item1);
+                    //bool isRotationEnabled = IsPropertyValuePositive(PropertiesDictionary[Rotating + Speed].Item1),
+                    //     isLiftingEnabled = IsPropertyValuePositive(PropertiesDictionary[Lifting + Speed].Item1);
 
-                    if (isRotationEnabled || isLiftingEnabled)
-                    {
-                        ShowPropertyField(PropertiesDictionary[Drag + Key], LargeSpace);
-                    }
+                    //if (isRotationEnabled || isLiftingEnabled)
+                    //{
+                    //    ShowPropertyField(PropertiesDictionary["_drag" + Key], LargeSpace);
+                    //}
                     break;
                     #region Debug
 #if DEBUG

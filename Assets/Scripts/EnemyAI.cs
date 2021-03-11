@@ -4,35 +4,50 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    public NavMeshAgent agent;
-    public Transform player;
-    public GameObject BulletPrefab;
-    public Transform LeftBulletStartPlace;
-    public Transform RightBulletStartPlace;
-    public LayerMask PlayerLayer;
-    public LayerMask FloorLayer;
+    [SerializeField]
+    private NavMeshAgent _agent;
+    [SerializeField]
+    private Transform _player;
+    [SerializeField]
+    private GameObject _bulletPrefab;
+    [SerializeField]
+    private Transform _leftBulletStartPlace;
+    [SerializeField]
+    private Transform _rightBulletStartPlace;
+    [SerializeField]
+    private LayerMask _playerLayer;
+    [SerializeField]
+    private LayerMask _floorLayer;
 
+    [SerializeField]
     [Range(0, 100)]
-    public float Health = 100;
+    private float _health = 100;
+    [SerializeField]
     [Range(0, 1)]
-    public float ShotDuration = 0.5f;
+    private float _shotDuration = 0.5f;
+    [SerializeField]
     [Range(0, 1000)]
-    public float ShotForce = 600f;
+    private float _shotForce = 600f;
+    [SerializeField]
     [Range(0, 1)]
-    public float animationSmooth = 0.2f;
+    private float _animationSmooth = 0.2f;
+    [SerializeField]
     [Range(0, 20)]
-    public float SightRange = 10;
+    private float _sightRadius = 10;
+    [SerializeField]
     [Range(0, 20)]
-    public float AttackRange = 5;
-    public bool IsPlayerInSightRange;
-    public bool IsPlayerInAttackRange;
+    private float _attackRadius = 5;
+    [SerializeField]
+    [Range(0, 10)]
+    private float _stoppingDistance = 4;
 
     private Animator _animator;
-    private Rigidbody _rigidbody;                                                    
-
+    private Rigidbody _rigidbody;
+    private Vector3 _spawnPlace;
+    private bool _isPlayerInSightRange;
+    private bool _isPlayerInAttackRange;                                           
     private float _lastShotTime = 0;
     private bool _lastShotWasLeft = false;
-    private const string PlayerBulletTag = "PlayerBullet";
 
     //public Vector3 walkPoint;
     //bool walkPointSet;
@@ -40,53 +55,66 @@ public class EnemyAI : MonoBehaviour
 
     private void Awake()
     {
-        if (PlayerLayer == 0)
+        if (_playerLayer == 0)
         {
-            PlayerLayer = LayerMask.GetMask("Player");
-        }
-        if (FloorLayer == 0)
-        {
-            FloorLayer = LayerMask.GetMask("Floor");
+            _playerLayer = LayerMask.GetMask(Constanter.PlayerLayerName);
         }
 
-        player = GameObject.Find("Player").transform;
-        agent = GetComponent<NavMeshAgent>();
-        agent.isStopped = true;
+        if (_floorLayer == 0)
+        {
+            _floorLayer = LayerMask.GetMask(Constanter.FloorLayerName);
+        }
 
+        if (!_player)
+        {
+            _player = GameObject.FindGameObjectWithTag(Constanter.PlayerTagName).transform;
+        }
+
+        _spawnPlace = transform.position;
+
+        _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
         _animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
+        _agent.isStopped = true;
     }
 
     private void Update()
     {
         //Check for sight and attack range
-        IsPlayerInSightRange = Physics.CheckSphere(transform.position, SightRange, PlayerLayer);
-        IsPlayerInAttackRange = Physics.CheckSphere(transform.position, AttackRange, PlayerLayer);
+        _isPlayerInSightRange = Physics.CheckSphere(transform.position, _sightRadius, _playerLayer);
+        _isPlayerInAttackRange = Physics.CheckSphere(transform.position, _attackRadius, _playerLayer);
 
-        if (IsPlayerInSightRange)
+        if (_isPlayerInSightRange)
         {
-            Debug.Log("Player In Sight Range");
+            //Debug.Log("Player In Sight Range");
 
-            transform.LookAt(player);
-            agent.SetDestination(player.position);
+            transform.LookAt(_player);
+            _agent.SetDestination(_player.position);
 
-            if (agent.remainingDistance > agent.stoppingDistance)
+            if (_agent.remainingDistance > _agent.stoppingDistance)
             {
-                agent.isStopped = false;
+                _agent.isStopped = false;
             }
             else
             {
-                agent.isStopped = true;
+                _agent.isStopped = true;
             }
 
-            if (IsPlayerInAttackRange)
+            if (_isPlayerInAttackRange)
             {
                 AttackPlayer();
             }
         }
-        else
+        else if (!_agent.isStopped)
         {
-            agent.isStopped = true;
+            _agent.SetDestination(_spawnPlace);
+            _agent.stoppingDistance = 0.1f;
+
+            if (_agent.remainingDistance < _agent.stoppingDistance)
+            {
+                _agent.isStopped = true;
+                _agent.stoppingDistance = _stoppingDistance;
+            }
         }
 
         //if (!playerInSightRange && !playerInAttackRange)
@@ -94,6 +122,11 @@ public class EnemyAI : MonoBehaviour
         //    Patroling();
         //}
         UpdateAnimator();
+    }
+
+    private void Patrol()
+    {
+
     }
 
     //private void Patroling()
@@ -125,20 +158,20 @@ public class EnemyAI : MonoBehaviour
 
     private void AttackPlayer()
     {
-        Debug.Log("AttackPlayer");
-        if (_lastShotTime > ShotDuration)
+        //Debug.Log("AttackPlayer");
+        if (_lastShotTime > _shotDuration)
         {
-            var bullet = Instantiate(BulletPrefab);
-            var bulletStartPlace = LeftBulletStartPlace;
+            var bullet = Instantiate(_bulletPrefab);
+            var bulletStartPlace = _leftBulletStartPlace;
             _lastShotTime = 0;
 
             if (_lastShotWasLeft)
             {
-                bulletStartPlace = RightBulletStartPlace;
+                bulletStartPlace = _rightBulletStartPlace;
             }
 
             bullet.transform.SetPositionAndRotation(bulletStartPlace.position, bulletStartPlace.rotation);
-            bullet.GetComponent<Rigidbody>().AddForce(bulletStartPlace.up * ShotForce);
+            bullet.GetComponent<Rigidbody>().AddForce(bulletStartPlace.up * _shotForce);
             _lastShotWasLeft = !_lastShotWasLeft;
             //Invoke(nameof(ResetAttack), timeBetweenAttacks);
         }
@@ -148,15 +181,15 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
-        Debug.Log($"{gameObject.name}. Health = {Health}");
+        //Debug.Log($"{gameObject.name}. Health = {_health}");
 
-        Health -= damage;
+        _health -= damage;
 
-        if (Health <= 0)
+        if (_health <= 0)
         {
-            Invoke(nameof(DestroyEnemy), 0.5f);
+            Invoke(nameof(DestroyEnemy), 0.2f);
         }
     }
 
@@ -167,7 +200,7 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        _animator.SetFloat(vAnimatorParameters.InputMagnitude, agent.isStopped ? 0 : 0.5f, animationSmooth, Time.deltaTime);
+        _animator.SetFloat(vAnimatorParameters.InputMagnitude, _agent.isStopped ? 0 : 0.5f, _animationSmooth, Time.deltaTime);
     }
 
     public static partial class vAnimatorParameters
@@ -183,16 +216,18 @@ public class EnemyAI : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, AttackRange);
+        Gizmos.DrawWireSphere(transform.position, _attackRadius);
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, SightRange);
+        Gizmos.DrawWireSphere(transform.position, _sightRadius);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag(PlayerBulletTag))
+        var collider = collision.gameObject;
+
+        if (collider.CompareTag(Constanter.PlayerBulletTagName))
         {
-            TakeDamage(25);
+            TakeDamage(collider.GetComponent<Bullet>().Damage);
         }
     }
 

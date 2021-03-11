@@ -1306,7 +1306,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2244941116701604203}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0.13, y: 1.5, z: 0.2}
+  m_LocalPosition: {x: 0.13, y: 1.45, z: 0.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2244941117133785988}
@@ -1973,7 +1973,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2244941117135497760}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0.13, y: 1.5, z: 0.2}
+  m_LocalPosition: {x: -0.13, y: 1.45, z: 0.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2244941116305715135}
@@ -3436,7 +3436,7 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.3
-  m_Height: 1.7
+  m_Height: 1.9
   m_Direction: 1
   m_Center: {x: 0, y: 0.95, z: 0}
 --- !u!195 &4603923171027563194
@@ -3473,23 +3473,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b8f07906abe5a04babd68d04fba683c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 4603923171027563194}
-  player: {fileID: 0}
-  BulletPrefab: {fileID: 4775723623865806971, guid: f88fbc74021a0054d8d2f62cb6303ae4,
+  _agent: {fileID: 0}
+  _player: {fileID: 0}
+  _bulletPrefab: {fileID: 4775723623865806971, guid: f88fbc74021a0054d8d2f62cb6303ae4,
     type: 3}
-  LeftBulletStartPlace: {fileID: 2244941116305715135}
-  RightBulletStartPlace: {fileID: 2244941117133785988}
-  PlayerLayer:
+  _leftBulletStartPlace: {fileID: 2244941116305715135}
+  _rightBulletStartPlace: {fileID: 2244941117133785988}
+  _playerLayer:
     serializedVersion: 2
     m_Bits: 0
-  FloorLayer:
+  _floorLayer:
     serializedVersion: 2
-    m_Bits: 512
-  Health: 100
-  ShotDuration: 0.5
-  ShotForce: 600
-  animationSmooth: 0.2
-  SightRange: 10
-  AttackRange: 5
-  IsPlayerInSightRange: 0
-  IsPlayerInAttackRange: 0
+    m_Bits: 0
+  _health: 100
+  _shotDuration: 0.5
+  _shotForce: 600
+  _animationSmooth: 0.2
+  _sightRadius: 10
+  _attackRadius: 5
+  _stoppingDistance: 4

@@ -2,7 +2,7 @@
 
 namespace Invector.vCharacterController
 {
-    public class vThirdPersonMotor : MonoBehaviour
+    public class PlayerMotor : MonoBehaviour
     {
         #region Inspector Variables
 

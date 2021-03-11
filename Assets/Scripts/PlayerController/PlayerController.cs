@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Invector.vCharacterController
 {
-    public class vThirdPersonController : vThirdPersonAnimator
+    public class PlayerController : PlayerAnimator
     {
         private float lastShotTime = 0;
         private bool lastShotWasLeft = false;       
@@ -58,19 +58,6 @@ namespace Invector.vCharacterController
         {
             if (lockRotation) return;
 
-            //bool validInput = input != Vector3.zero || (isStrafing ? strafeSpeed.rotateWithCamera : freeSpeed.rotateWithCamera);
-            //validInput = false;
-            //if (validInput)
-            //{
-            //    // calculate input smooth
-            //    inputSmooth = Vector3.Lerp(inputSmooth, input, (isStrafing ? strafeSpeed.movementSmooth : freeSpeed.movementSmooth) * Time.deltaTime);
-
-            //    Vector3 dir = freeSpeed.rotateWithCamera && input == Vector3.zero && rotateTarget ? rotateTarget.forward : moveDirection;
-            //    RotateToDirection(dir);
-            //}
-            //else
-            //{
-
             Camera camera = Camera.main;
             Plane plane = new Plane(transform.up, -transform.position.y);
             Vector3 mousePosition = Input.mousePosition;
@@ -87,8 +74,6 @@ namespace Invector.vCharacterController
             direction.Normalize();
             float rotationY = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
             transform.localRotation = Quaternion.Euler(0, 90 - rotationY, 0);    
-            
-            //}
         }
 
         public virtual void UpdateMoveDirection(Transform referenceTransform = null)

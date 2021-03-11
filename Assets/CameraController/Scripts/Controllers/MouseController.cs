@@ -8,6 +8,8 @@ namespace ССP.Controllers
     {
         private const float MaxHorizontalDrag = 1.5f, MaxVerticalDrag = 1.5f, MaxScroll = 0.001f;
 
+        public static KeyCode DradKey => KeyCode.Mouse1;
+
         public static float Scroll
         {
             get

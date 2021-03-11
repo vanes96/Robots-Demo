@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using ССP.Controllers;
 
 namespace Invector.vCharacterController
 {
-    public class vThirdPersonInput : MonoBehaviour
+    public class PlayerInput : MonoBehaviour
     {
         #region Variables       
 
@@ -12,7 +13,7 @@ namespace Invector.vCharacterController
         public KeyCode jumpInput = KeyCode.Space;
         public KeyCode sprintInput = KeyCode.LeftShift;
 
-        [HideInInspector] public vThirdPersonController cc;
+        [HideInInspector] public PlayerController cc;
         [HideInInspector] public Camera cameraMain;
 
         #endregion
@@ -26,8 +27,12 @@ namespace Invector.vCharacterController
         {
             Time.timeScale = 1f;
             cc.UpdateMotor();               
-            cc.ControlLocomotionType();     
-            cc.ControlRotationType();       
+            cc.ControlLocomotionType();
+
+            if (!MouseController.IsKeyPressed(MouseController.DradKey))
+            {
+                cc.ControlRotationType();
+            }
         }
 
         protected virtual void Update()
@@ -45,7 +50,7 @@ namespace Invector.vCharacterController
 
         protected virtual void InitilizeController()
         {
-            cc = GetComponent<vThirdPersonController>();
+            cc = GetComponent<PlayerController>();
 
             if (cc != null)
                 cc.Init();

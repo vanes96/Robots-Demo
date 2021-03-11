@@ -61,7 +61,7 @@ namespace ССP.Controllers
         #endregion
 
         #region Options
-        public KeyCode DragKey = KeyCode.Mouse1;
+        private KeyCode _dragKey = MouseController.DradKey;
         public bool LookAtCamera = false;
         #endregion
         #endregion
@@ -130,7 +130,7 @@ namespace ССP.Controllers
             float absoluteTargetRotation, targetHeight, targetDistance, targetRotation;
             float deltaTime = Time.deltaTime;
             float mouseScroll = MouseController.GetNormalizedScroll(deltaTime); //Logger_.Instance.Log("mouseScroll", mouseScroll); // * deltaTime 
-            bool isMouseDragging = MouseController.IsKeyPressed(DragKey);
+            bool isMouseDragging = MouseController.IsKeyPressed(_dragKey);
             var currentMouseDrag = Vector3.zero;
 
             _cameraTarget.transform.SetPositionAndRotation(Player.position + PositionOffset, Player.rotation);

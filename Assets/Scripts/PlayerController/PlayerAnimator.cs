@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Invector.vCharacterController
 {
-    public class vThirdPersonAnimator : vThirdPersonMotor
+    public class PlayerAnimator : PlayerMotor
     {
         #region Variables                
 
