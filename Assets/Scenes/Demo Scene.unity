@@ -4402,7 +4402,7 @@ PrefabInstance:
     - target: {fileID: 4876274103830201463, guid: b60dc66667477ba4c9ca4226fb119135,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.01999998
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4876274103830201463, guid: b60dc66667477ba4c9ca4226fb119135,
         type: 3}
@@ -4412,12 +4412,12 @@ PrefabInstance:
     - target: {fileID: 4876274103830201463, guid: b60dc66667477ba4c9ca4226fb119135,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -21.15112
+      value: -21.151123
       objectReference: {fileID: 0}
     - target: {fileID: 4876274103830201463, guid: b60dc66667477ba4c9ca4226fb119135,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.4694716
+      value: 0.46947154
       objectReference: {fileID: 0}
     - target: {fileID: 4876274103830201463, guid: b60dc66667477ba4c9ca4226fb119135,
         type: 3}
@@ -4472,6 +4472,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7059960243528420378, guid: 564f6beed6028d84bb428c6113485d5d,
+        type: 3}
+      propertyPath: freeSpeed.sprintSpeed
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7059960244499880575, guid: 564f6beed6028d84bb428c6113485d5d,
         type: 3}

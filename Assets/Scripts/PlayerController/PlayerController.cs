@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Invector.vCharacterController
+namespace Robo.PlayerController
 {
     public class PlayerController : PlayerAnimator
     {

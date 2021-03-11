@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-namespace Invector.vCharacterController
+namespace Robo.PlayerController
 {
     public class PlayerMotor : MonoBehaviour
     {
@@ -14,10 +15,9 @@ namespace Invector.vCharacterController
         [Range(0, 1)]
         public float ShotDuration;
 
-        public vMovementSpeed freeSpeed;
+        public PlayerSpeed freeSpeed;
 
         [Header("Airborne")]
-
         [Tooltip("Use the currently Rigidbody Velocity to influence on the Jump Distance")]
         public bool jumpWithRigidbodyForce = false;
         public float jumpDuration = 0.3f;
@@ -30,7 +30,7 @@ namespace Invector.vCharacterController
         [HideInInspector]
         public float limitFallVelocity = -15f;
 
-        [Header("- Ground")]
+        [Header("Ground")]
         [Tooltip("Layers that the character can walk on")]
         public LayerMask groundLayer = 1 << 0;
         [Tooltip("Distance to became not grounded")]
@@ -59,7 +59,7 @@ namespace Invector.vCharacterController
         internal float inputMagnitude;                      // sets the inputMagnitude to update the animations in the animator controller
         internal float verticalSpeed;                       // set the verticalSpeed based on the verticalInput
         internal float horizontalSpeed;                     // set the horizontalSpeed based on the horizontalInput       
-        internal float moveSpeed;                           // set the current moveSpeed for the MoveCharacter method
+        internal float moveSpeed;                           
         internal float verticalVelocity;                    // set the vertical velocity of the rigidbody
         internal float colliderRadius, colliderHeight;      // storage capsule collider extra information        
         internal float heightReached;                       // max height that character reached in air;
@@ -82,34 +82,26 @@ namespace Invector.vCharacterController
             animator = GetComponent<Animator>();
             animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
 
-            // slides the character through walls and edges
             frictionPhysics = new PhysicMaterial();
             frictionPhysics.name = "frictionPhysics";
             frictionPhysics.staticFriction = .25f;
             frictionPhysics.dynamicFriction = .25f;
             frictionPhysics.frictionCombine = PhysicMaterialCombine.Multiply;
 
-            // prevents the collider from slipping on ramps
             maxFrictionPhysics = new PhysicMaterial();
             maxFrictionPhysics.name = "maxFrictionPhysics";
             maxFrictionPhysics.staticFriction = 1f;
             maxFrictionPhysics.dynamicFriction = 1f;
             maxFrictionPhysics.frictionCombine = PhysicMaterialCombine.Maximum;
 
-            // air physics 
             slippyPhysics = new PhysicMaterial();
             slippyPhysics.name = "slippyPhysics";
             slippyPhysics.staticFriction = 0f;
             slippyPhysics.dynamicFriction = 0f;
             slippyPhysics.frictionCombine = PhysicMaterialCombine.Minimum;
 
-            // rigidbody info
             _rigidbody = GetComponent<Rigidbody>();
-
-            // capsule collider info
             _capsuleCollider = GetComponent<CapsuleCollider>();
-
-            // save your collider preferences 
             colliderCenter = GetComponent<CapsuleCollider>().center;
             colliderRadius = GetComponent<CapsuleCollider>().radius;
             colliderHeight = GetComponent<CapsuleCollider>().height;
@@ -127,9 +119,9 @@ namespace Invector.vCharacterController
 
         #region Locomotion
 
-        public virtual void SetControllerMoveSpeed(vMovementSpeed speed)
+        public virtual void SetControllerMoveSpeed(PlayerSpeed speed)
         {
-            moveSpeed = Mathf.Lerp(moveSpeed, isSprinting ? speed.runningSpeed : speed.walkSpeed, speed.movementSmooth * Time.deltaTime);
+            moveSpeed = Mathf.Lerp(moveSpeed, isSprinting ? speed.sprintSpeed : speed.walkSpeed, speed.movementSmooth * Time.deltaTime);
         }
 
         public virtual void MoveCharacter(Vector3 _direction)
@@ -316,22 +308,15 @@ namespace Invector.vCharacterController
 
         #endregion
 
-        [System.Serializable]
-        public class vMovementSpeed
+        [Serializable]
+        public class PlayerSpeed
         {
             [Range(1f, 20f)]
             public float movementSmooth = 6f;
             [Range(0f, 1f)]
             public float animationSmooth = 0.2f;
-            [Tooltip("Rotation speed of the character")]
-            public float rotationSpeed = 16f;
-            [Tooltip("Rotate with the Camera forward when standing idle")]
-            public bool rotateWithCamera = false;
-            [Tooltip("Speed to Walk using rigidbody or extra speed if you're using RootMotion")]
             public float walkSpeed = 2f;
-            [Tooltip("Speed to Run using rigidbody or extra speed if you're using RootMotion")]
-            public float runningSpeed = 4f;
-            [Tooltip("Speed to Sprint using rigidbody or extra speed if you're using RootMotion")]
+            //public float runningSpeed = 4f;
             public float sprintSpeed = 6f;
         }
     }

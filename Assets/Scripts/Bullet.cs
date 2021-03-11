@@ -10,6 +10,11 @@ public class Bullet : MonoBehaviour
 
     public float Damage => _damage;
 
+    private void Start()
+    {
+        Destroy(gameObject, 3f);
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         //Debug.Log(LayerMask.NameToLayer(Constanter.FloorLayerName));

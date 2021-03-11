@@ -1,13 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
+    private const float SpawnRadius = 3;
+
+    private Dictionary<Vector3, bool> _spawnPlacesAvailability;
+
     [SerializeField]
     private GameObject _enemyPrefab;
     [SerializeField]
-    private List<Vector3> _spawnPlaces;
+    private LayerMask _enemyLayer;
+    [SerializeField]
+    private LayerMask _playerLayer;
     [SerializeField]
     private int _enemiesNumber = 3;
     [SerializeField]
@@ -16,14 +23,8 @@ public class EnemySpawner : MonoBehaviour
     private List<float> _remainingTimeToSpawn;
     [SerializeField]
     private List<GameObject> _enemies;
-    [SerializeField]
-    private LayerMask _enemyLayer;
-    [SerializeField]
-    private LayerMask _playerLayer;
 
-    private const float SpawnRadius = 3;
-
-    void Start()
+    private void Start()
     {
         _enemies = new List<GameObject>();
         _remainingTimeToSpawn = new List<float>();
@@ -37,6 +38,15 @@ public class EnemySpawner : MonoBehaviour
             _playerLayer = LayerMask.GetMask(Constanter.PlayerLayerName);
         }
 
+        _spawnPlacesAvailability = new Dictionary<Vector3, bool>
+        {
+            { new Vector3(-4, 3, 2), true },
+            { new Vector3(-4, 3, -2), true },
+            { new Vector3(0, 3, 0), true },
+            { new Vector3(4, 3, 2), true },
+            { new Vector3(4, 3, -2), true }
+        };
+
         for (int i = 0; i < _enemiesNumber; i++)
         {
             _remainingTimeToSpawn.Add(_spawnDelay);
@@ -44,12 +54,13 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    void Update()
+    private void Update()
     {
         for (int i = 0; i < _enemies.Count; i++)
         {
-            if (!_enemies[i])
+            if (!_enemies[i].activeSelf)
             {
+                _spawnPlacesAvailability[_enemies[i].GetComponent<EnemyAI>().SpawnPlace] = true;
                 _remainingTimeToSpawn[i] -= Time.deltaTime;
 
                 if (_remainingTimeToSpawn[i] <= 0)
@@ -58,25 +69,31 @@ public class EnemySpawner : MonoBehaviour
                     _remainingTimeToSpawn[i] = _spawnDelay;
                 }
             }
+            else
+            {
+                _spawnPlacesAvailability[_enemies[i].GetComponent<EnemyAI>().SpawnPlace] = false;
+            }
         }
     }
 
     private GameObject Spawn()
     {
         Vector3 spawnPlace = Vector3.zero;
-        int placeIndex;
 
         for (; spawnPlace == Vector3.zero;)
         {
-            placeIndex = Random.Range(0, 5);
+            var placeIndex = Random.Range(0, _spawnPlacesAvailability.Count);
+            var spawnPlaces = _spawnPlacesAvailability.Keys.ToList();
 
-            if (!Physics.CheckSphere(_spawnPlaces[placeIndex], SpawnRadius, _enemyLayer) && 
-                !Physics.CheckSphere(_spawnPlaces[placeIndex], SpawnRadius, _playerLayer))
+            if (!Physics.CheckSphere(spawnPlaces[placeIndex], SpawnRadius, _enemyLayer) && 
+                !Physics.CheckSphere(spawnPlaces[placeIndex], SpawnRadius, _playerLayer) &&
+                _spawnPlacesAvailability[spawnPlaces[placeIndex]])
             {
-                spawnPlace = _spawnPlaces[placeIndex];
+                spawnPlace = spawnPlaces[placeIndex];
             }
         }
 
+        _spawnPlacesAvailability[spawnPlace] = false;
         return Instantiate(_enemyPrefab, spawnPlace, Quaternion.identity);
     }
 }

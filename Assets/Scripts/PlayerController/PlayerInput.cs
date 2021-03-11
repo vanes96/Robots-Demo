@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using ССP.Controllers;
 
-namespace Invector.vCharacterController
+namespace Robo.PlayerController
 {
     public class PlayerInput : MonoBehaviour
     {

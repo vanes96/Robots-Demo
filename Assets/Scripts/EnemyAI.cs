@@ -4,6 +4,14 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
+    private Animator _animator;
+    private Rigidbody _rigidbody;
+    private Vector3 _spawnPlace;
+    private bool _isPlayerInSightRange;
+    private bool _isPlayerInAttackRange;
+    private float _lastShotTime = 0;
+    private bool _lastShotWasLeft = false;
+
     [SerializeField]
     private NavMeshAgent _agent;
     [SerializeField]
@@ -41,14 +49,7 @@ public class EnemyAI : MonoBehaviour
     [Range(0, 10)]
     private float _stoppingDistance = 4;
 
-    private Animator _animator;
-    private Rigidbody _rigidbody;
-    private Vector3 _spawnPlace;
-    private bool _isPlayerInSightRange;
-    private bool _isPlayerInAttackRange;                                           
-    private float _lastShotTime = 0;
-    private bool _lastShotWasLeft = false;
-
+    public Vector3 SpawnPlace => _spawnPlace;
     //public Vector3 walkPoint;
     //bool walkPointSet;
     //public float walkPointRange;
@@ -117,44 +118,8 @@ public class EnemyAI : MonoBehaviour
             }
         }
 
-        //if (!playerInSightRange && !playerInAttackRange)
-        //{
-        //    Patroling();
-        //}
         UpdateAnimator();
     }
-
-    private void Patrol()
-    {
-
-    }
-
-    //private void Patroling()
-    //{
-    //    if (!walkPointSet) 
-    //        SearchWalkPoint();
-
-    //    if (walkPointSet)
-    //        agent.SetDestination(walkPoint);
-
-    //    Vector3 distanceToWalkPoint = transform.position - walkPoint;
-
-    //    //Walkpoint reached
-    //    if (distanceToWalkPoint.magnitude < 1f)
-    //        walkPointSet = false;
-    //}
-    //private void SearchWalkPoint()
-    //{
-    //    float randomZ = Random.Range(-walkPointRange, walkPointRange);
-    //    float randomX = Random.Range(-walkPointRange, walkPointRange);
-
-    //    walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
-
-    //    if (Physics.Raycast(walkPoint, -transform.up, 2f, FloorLayer))
-    //    {
-    //        walkPointSet = true;
-    //    }
-    //}
 
     private void AttackPlayer()
     {
@@ -189,7 +154,7 @@ public class EnemyAI : MonoBehaviour
 
         if (_health <= 0)
         {
-            Invoke(nameof(DestroyEnemy), 0.2f);
+            Invoke(nameof(Die), 0.2f);
         }
     }
 
@@ -208,9 +173,10 @@ public class EnemyAI : MonoBehaviour
         public static int InputMagnitude = Animator.StringToHash("InputMagnitude");
     }
 
-    private void DestroyEnemy()
+    private void Die()
     {
-        Destroy(gameObject);
+        gameObject.SetActive(false);
+        Destroy(gameObject, 10);
     }
 
     private void OnDrawGizmosSelected()
