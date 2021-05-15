@@ -80,14 +80,14 @@ public class EnemySpawner : MonoBehaviour
     {
         Vector3 spawnPlace = Vector3.zero;
 
-        for (; spawnPlace == Vector3.zero;)
+        for (int count = 0; spawnPlace == Vector3.zero; count++)
         {
             var placeIndex = Random.Range(0, _spawnPlacesAvailability.Count);
             var spawnPlaces = _spawnPlacesAvailability.Keys.ToList();
 
             if (!Physics.CheckSphere(spawnPlaces[placeIndex], SpawnRadius, _enemyLayer) && 
                 !Physics.CheckSphere(spawnPlaces[placeIndex], SpawnRadius, _playerLayer) &&
-                _spawnPlacesAvailability[spawnPlaces[placeIndex]])
+                _spawnPlacesAvailability[spawnPlaces[placeIndex]] || count >= 10)
             {
                 spawnPlace = spawnPlaces[placeIndex];
             }
